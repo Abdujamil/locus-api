@@ -10,7 +10,24 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Security
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          'script-src': [
+            "'self'",
+            "'unsafe-inline'",
+            'https://cdn.jsdelivr.net',
+            'https://vercel.live',
+          ],
+          'style-src': ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+          'img-src': ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
+          'font-src': ["'self'", 'https://cdn.jsdelivr.net'],
+        },
+      },
+    }),
+  );
   app.enableCors(); // Basic CORS
 
   app.useGlobalPipes(
@@ -46,6 +63,12 @@ async function bootstrap() {
     swaggerOptions: {
       persistAuthorization: true, // Keeps user logged in upon page refresh
     },
+    customCssUrl:
+      'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.2/swagger-ui.css',
+    customJs: [
+      'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.2/swagger-ui-bundle.js',
+      'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.11.2/swagger-ui-standalone-preset.js',
+    ],
   });
 
   await app.listen(3000);
